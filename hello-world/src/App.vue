@@ -165,15 +165,28 @@
 <!-- computed Properties -->
 <h2>Fullname - {{ firstname }} {{ lastname }}</h2>
 <h2>Fullname Computed {{ fullname }}</h2>
+<button @click="changFullName">Changfullname</button>
+
 <h2>Total -{{ item.reduce((total , curr) => (total = total + curr.price) , 0) }}</h2>
 <button @click="item.push({ id:4 , title : 'keyboard' , price: 50})">Add item</button>
 <h2>Computed Total - {{ total }}</h2>
 <h2>Method Total -{{ getTotal() }}</h2>
-<input type="text" v-model="country">
+<input type="text" v-model="country"/>
+<template v-for="item in sellerItems" :key="item.id">
+    <h2 v-if="item.price > 100"> {{ item.title }} {{ item.price }}</h2>
+</template>
+<h2 v-for="item in expensiveItems" :key="item.id">{{ item.title }} {{ item.price }}</h2>
+<!-- watcher -->
+<h2>Volume Tracker (0-20)</h2>
+<h3>Current Volume - {{ volume }}</h3>
+<button @click="volume += 2">Increase</button>
+<button @click="volume -= 2">Decrease</button>
 </section>
 </template>
 
 <script>
+
+
 
 
 export default {
@@ -280,7 +293,26 @@ export default {
         price:300
       }
      ],
-     country: ''
+     country: '',
+     sellerItems:[
+      {
+        id:1,
+        title:'TV',
+        price:100
+      },
+      {
+        id:2,
+        title:'Phone',
+        price:200
+      },
+      {
+        id:3,
+        title:'laptop',
+        price:300
+      }
+     ],
+     //watcher
+     volume:0
    };
  },
  methods:{
@@ -304,23 +336,46 @@ export default {
  //submitForm
  submitForm(){ 
   console.log('Form values' , this.formValues)
- },
+ },     
 //
 getTotal(){
   console.log('getTotal Method')
   return  this.item.reduce((total , curr) => (total = total + curr.price) , 0)
+},
+changFullName(){
+  this.fullname = 'clark Kent'
 }
  },
  computed:{
-  fullname (){
-    return `${this.firstname} ${this.lastname}`
+  fullname:{
+    get(){
+      return `${this.firstname} ${this.lastname}`
+    },
+    Set(value){
+      const names = value.split(' ')
+      this.firstname = names[0]
+      this.lastname = names[1]
+    }
   },
+  // fullname (){
+  //   return `${this.firstname} ${this.lastname}`
+  // },
   total (){
     console.log('Total computed properties')
     return this.item.reduce((total , curr) => (total = total + curr.price) , 0)
+  },
+  expensiveItems(){
+      return this.sellerItems.filter(item => item.price > 100)
+  },
+ 
+ },
+ watch:{
+  volume (newValue , oldValue){
+    if ( newValue > oldValue && newValue === 16){
+      alert('Listening to a high volume for a long time may damage your hearing')
+    }
   }
-  
- }
+}
 };
 </script>
 
